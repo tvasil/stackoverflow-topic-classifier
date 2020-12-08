@@ -117,12 +117,12 @@ _BAD_SYMBOLS_RE = re.compile(r"[^0-9a-z #+_]")
 _STOPWORDS = set(stopwords.words("english"))
 
 
-def text_prepare(arr: np.ndarray, join_symbol: str) -> List(str):
+def text_prepare(arr: np.ndarray, join_symbol: str) -> List[str]:
     """Prepare both X and Y text by lowering, removing stopwords and
     replacing special characters. Return a list of strings joined by 'join_symbol'
     """
 
-    def process(text: str, join_symbol: str):
+    def process(text: str, join_symbol: str) -> str:
         """Actual processing function"""
         text = text.lower()
         text = re.sub(_REPLACE_BY_SPACE_RE, " ", text)
@@ -135,7 +135,7 @@ def text_prepare(arr: np.ndarray, join_symbol: str) -> List(str):
     return [process(text, join_symbol) for text in arr]
 
 
-def transform_y(arr: np.ndarray, join_symbol: str = ",") -> List(set):
+def transform_y(arr: np.ndarray, join_symbol: str = ",") -> List[set]:
     """Specific function to transform the Y tags and return as a list of sets,
     the format required by MultiLabelBinarizer"""
     arr = text_prepare(arr, join_symbol=join_symbol)
@@ -153,7 +153,7 @@ def binarize_ys(
     return binarizer, y_train_binarized, y_test_binarized
 
 
-def tokenize_and_stem(text: str) -> List(str):
+def tokenize_and_stem(text: str) -> List[str]:
     """Tokenizes a sentence and then stems each word in the sentence.
     Returns a list of tokens/stems"""
     tokenized_list = word_tokenize(text)
