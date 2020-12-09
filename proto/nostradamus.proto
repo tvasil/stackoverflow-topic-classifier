@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// option java_multiple_files = true;
+// option java_package = "io.grpc,nostradamus";
+// option java_outer_classname = "NostradamusProto";
+option objc_class_prefix = "NOS";
+
+package nostradamus;
+
+// The TopicLabeler service definition.
+service TopicLabeler {
+  // Sends a topic label prediction
+  rpc Predict (TopicLabelRequest) returns (TopicLabelReply) {}
+}
+
+// The request message containing the SO post title and body
+message TopicLabelRequest {
+  string title = 1;
+  string body = 2;
+}
+
+// The response message containing an array of topics to label with
+message TopicLabelReply {
+  map<string, double> prediction = 1;
+}
