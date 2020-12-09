@@ -81,3 +81,14 @@ python nostradamus.service/nostradamus_client.py --host localhost --port 50051
 ```
 
 Note that the client implementation is just a demo to see how you would ask for a StackOverflow label prediction using the Python stub.
+
+## Running with Docker
+
+Simply build the image from the top directory and then run it as follows:
+
+```bash
+docker build . -t nostradamus # from the stackoverflow-topic-classifier dir
+docker run --rm -d -v /`pwd`/models:/models/ -p 50051:50051 --name nostradamus-container nostradamus
+```
+
+This will run your container in detached mode. The service is now up. You can check by running `docker ps` or making a request via the client, by running `python nostradamus.service/nostradamus_client.py --host localhost --port 50051`.
