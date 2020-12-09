@@ -49,3 +49,35 @@ pip install stackoverflow-topic-classifier/core
 # pip install stackoverflow-topic-classifier/prediction
 # pip install stackoverflow-topic-classifier/training
 ```
+
+## Running the gRPC service
+
+We've called the gRPC service `Nostradamus`, because it predicts the future :smile:, hopefully with better results that [the famous astrologer himself](https://en.wikipedia.org/wiki/Nostradamus). The basic way to run the service is the following:
+
+1. Ensure all the local packages you need are installed
+
+```bash
+pip install stackoverflow-topic-classifier/core
+pip install stackoverflow-topic-classifier/prediction
+```
+
+2. Ensure all gRPC dependencies are covered.
+
+```bash
+pip install grpcio
+pip install grpcio-reflection
+```
+
+3. Run the server in one terminal (note that it is run by default on port 50051)
+
+```bash
+python nostradamus.service/nostradamus_server.py
+```
+
+4. And in another terminal, run:
+
+```bash
+python nostradamus.service/nostradamus_client.py --host localhost --port 50051
+```
+
+Note that the client implementation is just a demo to see how you would ask for a StackOverflow label prediction using the Python stub.
