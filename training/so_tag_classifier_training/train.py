@@ -1,11 +1,13 @@
 import argparse
 import datetime
 import logging
+import tempfile
 import warnings
 
 import boto3
 import joblib
 import pandas as pd
+import yaml
 from params.parameter_tuning import scoring, search_space
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -22,7 +24,11 @@ _TEST_SIZE = 0.1
 _RANDOM_STATE = 42
 _RS_N_ITER = 50
 _RS_CV = 3
-_BUCKET = "tvasil-ml-models"
+
+with open("aws_config.yml", "r") as stream:
+    _AWS_CONFIGS = yaml.safe_load(stream)
+
+_BUCKET = _AWS_CONFIGS.get("bucket")
 
 
 def read_data(fname):
@@ -91,12 +97,15 @@ def train_base(X_train, y_train_binarized):
     return model
 
 
-def save_in_s3(fname: str) -> None:
+def save_in_s3(model, binarizer, fname: str) -> None:
     """
     Saves the resulting model + ybinarizer as a pickle and then uploads to S3
     """
     s3 = boto3.resource("s3")
-    s3.Object(_BUCKET, fname).put(Body=open("tmp/" + fname, "rb"))
+    with tempfile.TemporaryFile() as fp:
+        joblib.dump((model, binarizer), fp)
+        fp.seek(0)
+        s3.Bucket(_BUCKET).put_object(Key=fname, Body=fp.read())
 
 
 def _get_model_filename(model, binarizer):
@@ -149,6 +158,5 @@ if __name__ == "__main__":
     log_performance(X_test, y_test_binarized, model, binarizer, logger)
 
     fname = _get_model_filename(model, binarizer)
-    joblib.dump((model, binarizer), "tmp/" + fname)
-    save_in_s3(fname)  # upload to S3
+    save_in_s3(model, binarizer, fname)  # upload to S3
     logger.info("Finished training! Check the files and model in S3")
