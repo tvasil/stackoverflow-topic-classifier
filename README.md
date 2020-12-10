@@ -50,7 +50,8 @@ pip install stackoverflow-topic-classifier/core
 # pip install stackoverflow-topic-classifier/training
 ```
 
-## Running the gRPC service
+## Prediction
+### Running the gRPC service
 
 We've called the gRPC service `Nostradamus`, because it predicts the future :smile:, hopefully with better results that [the famous astrologer himself](https://en.wikipedia.org/wiki/Nostradamus). The basic way to run the service is the following:
 
@@ -82,7 +83,7 @@ python nostradamus.service/nostradamus_client.py --host localhost --port 50051
 
 Note that the client implementation is just a demo to see how you would ask for a StackOverflow label prediction using the Python stub.
 
-## Running with Docker
+### Running with Docker
 
 Simply build the image from the top directory and then run it as follows:
 
@@ -92,3 +93,21 @@ docker run --rm -d -v /`pwd`/models:/models/ -p 50051:50051 --name nostradamus-c
 ```
 
 This will run your container in detached mode. The service is now up. You can check by running `docker ps` or making a request via the client, by running `python nostradamus.service/nostradamus_client.py --host localhost --port 50051`.
+
+## Training
+To use the training module, you can directly execute the `train.py` script with some command-line arguments, or import the functions to run a manual training (for example in a notebook).
+
+To run the training, you have two options:
+
+1. Base model pipeline (the basic parameters are currently harcoded into the `_get_training_pipeline` function)
+2. Gridsearch CV starting from the base pipeline in #1, while searching through the space defined in `so_tag_classifier_training/params/parameter_tuning.py`.
+
+You can choose which way you want to run the training by adding (or not) the flag `--gs` (which stands for GridSearch)
+
+To run training (with grid search):
+
+```bash
+cd so_tag_classifier_training
+mkdir tmp # make sure this folder exists as this is where the models will be saved before being uploaded to S3
+python3 so_tag_classifier_training/train.py --train_data /path/to/data.csv --logger_file logs.log --gs
+```
