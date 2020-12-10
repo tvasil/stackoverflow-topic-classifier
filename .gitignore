@@ -2,3 +2,5 @@
 *.ipynb_checkpoints
 workspace.code-workspace
 .vscode/
+*.log
+tmp/
