@@ -1,18 +1,43 @@
-# TODO: Add possiblity to read the model from S3
 import argparse
+import tempfile
 
+import boto3
 import joblib
+import yaml
 from so_tag_classifier_core import _TAGS_TO_KEEP, text_prepare, tokenize_and_stem
 
+with open("aws_config.yml", "r") as stream:
+    _AWS_CONFIGS = yaml.safe_load(stream)
+
+_BUCKET = _AWS_CONFIGS.get("bucket")
 model = None
 mlb = None
 
 
-def prepare_model_if_needed(fname: str) -> None:
+def load_aws_config(fname: str):
+    """
+    Helper function to load Bucket name from a yaml file
+    """
+
+
+def load_model_from_s3(s3_key: str):
+    """
+    Returns model loaded from S3
+    """
+    global _BUCKET
+    s3 = boto3.client("s3")
+    with tempfile.TemporaryFile() as fp:
+        s3.download_fileobj(Fileobj=fp, Bucket=_BUCKET, Key=s3_key)
+        fp.seek(0)
+        model = joblib.load(fp)
+    return model
+
+
+def prepare_model_if_needed(s3_key: str) -> None:
     """ Loads the model if it's not already in memory. """
     global model, mlb
     if model is None and mlb is None:
-        model, mlb = joblib.load(fname)
+        model, mlb = load_model_from_s3(s3_key)
 
 
 def get_preds(model, binarizer, sentence: str) -> set:
@@ -28,10 +53,10 @@ def get_probability_preds(model, sentence: str) -> dict:
     return dict(zip(_TAGS_TO_KEEP, probs))
 
 
-def predict(sentence: str, fname: str) -> dict:
+def predict(sentence: str, s3_key: str) -> dict:
     """ Makes a label prediction with probability, based on a sentence and a model"""
     global model, mlb
-    prepare_model_if_needed(fname)
+    prepare_model_if_needed(s3_key)
 
     preds = get_preds(model, mlb, sentence)
     probs_dict = get_probability_preds(model, sentence)
@@ -48,10 +73,10 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    fname = args.model_path
+    s3_key = args.model_path
 
     import time
 
     start = time.time()
-    print(predict(args.txt, fname))
+    print(predict(args.txt, s3_key))
     print(f"predicted in {time.time() - start} seconds")
