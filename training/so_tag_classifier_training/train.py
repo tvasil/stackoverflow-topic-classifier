@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import importlib.resources as pkg_resources
 import logging
 import tempfile
 import warnings
@@ -25,9 +26,7 @@ _RANDOM_STATE = 42
 _RS_N_ITER = 50
 _RS_CV = 3
 
-with open("aws_config.yml", "r") as stream:
-    _AWS_CONFIGS = yaml.safe_load(stream)
-
+_AWS_CONFIGS = yaml.safe_load(pkg_resources.open_text("so_tag_classifier_prediction", "aws_config.yml"))
 _BUCKET = _AWS_CONFIGS.get("bucket")
 
 

@@ -1,4 +1,5 @@
 import argparse
+import importlib.resources as pkg_resources
 import tempfile
 
 import boto3
@@ -6,10 +7,9 @@ import joblib
 import yaml
 from so_tag_classifier_core import _TAGS_TO_KEEP, text_prepare, tokenize_and_stem
 
-with open("aws_config.yml", "r") as stream:
-    _AWS_CONFIGS = yaml.safe_load(stream)
-
+_AWS_CONFIGS = yaml.safe_load(pkg_resources.open_text("so_tag_classifier_prediction", "aws_config.yml"))
 _BUCKET = _AWS_CONFIGS.get("bucket")
+
 model = None
 mlb = None
 
