@@ -22,4 +22,4 @@ def log_performance(
             y_test_binarized, y_test_pred_binarized, target_names=binarizer.classes_, zero_division=1
         )
     )
-    logger.info("\nAccuracy Score:", accuracy_score(y_test_binarized, y_test_pred_binarized))
+    logger.info("\nAccuracy Score: {}".format(accuracy_score(y_test_binarized, y_test_pred_binarized)))
