@@ -5,10 +5,15 @@ import numpy as np
 
 try:
     from nltk.corpus import stopwords
+
+    _STOPWORDS = set(stopwords.words("english"))
 except:
     import nltk
 
     nltk.download("stopwords")
+    from nltk.corpus import stopwords
+
+    _STOPWORDS = set(stopwords.words("english"))
 
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
