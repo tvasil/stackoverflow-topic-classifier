@@ -2,7 +2,14 @@ import re
 from typing import List
 
 import numpy as np
-from nltk.corpus import stopwords
+
+try:
+    from nltk.corpus import stopwords
+except:
+    import nltk
+
+    nltk.download("stopwords")
+
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 from sklearn.preprocessing import MultiLabelBinarizer
